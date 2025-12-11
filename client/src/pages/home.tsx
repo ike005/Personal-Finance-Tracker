@@ -1,6 +1,39 @@
+import {useEffect, useState} from "react";
 
 
 const Home = () =>{
+    const [expense, setExpense] = useState<any>([]);
+    const [form, setForm] = useState<any>({name: "", amount: "", category: "", date: ""});
+
+    const handleFetch = async () => {
+        const response = await fetch("http://localhost:8000/expense");
+        const data = await response.json();
+        setExpense(data);
+    };
+
+    useEffect(() => {
+        handleFetch();
+    }, []);
+
+    const handleChange = (e) => {
+        setForm({ ...form, [e.target.name]: e.target.value });
+    };
+
+    const handleAdd = async (e: React.FormEvent) =>{
+        e.preventDefault();
+        await fetch("http://localhost:8000/expense", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(form),
+            }
+        );
+        setForm({ name: "", amount: "", category: "", date: "" });
+        handleFetch();
+    }
+
+
     return(
         <div className="h-[100vh] w-full px-10 pt-20 bg-[#fcfcfd]">
 
@@ -11,15 +44,15 @@ const Home = () =>{
 
                     <form className="flex flex-col gap-4">
                         <label htmlFor="expenseName" className="flex flex-col">Name
-                            <input id="expenseName" type="text" placeholder="Enter name" className="border-[1.2px] border-gray-300 rounded-sm p-2 text-sm" />
+                            <input name="name" value={form.name} onChange={handleChange} id="expenseName" type="text" placeholder="Enter name" className="border-[1.2px] border-gray-300 rounded-sm p-2 text-sm" />
                         </label>
 
                         <label htmlFor="expenseAmount" className="flex flex-col">Amount
-                            <input id="expenseAmount" type="number" placeholder="Enter amount" className="border-[1.2px] border-gray-300 rounded-sm p-2 text-sm" />
+                            <input name="amount" value={form.amount} onChange={handleChange} id="expenseAmount" type="number" placeholder="Enter amount" className="border-[1.2px] border-gray-300 rounded-sm p-2 text-sm" />
                         </label>
 
                         <label htmlFor="category" className="flex flex-col">Category
-                            <select id="category" className="border-[1.2px] border-gray-300 rounded-sm p-2 text-sm">
+                            <select name="category" value={form.category} onChange={handleChange} id="category" className="border-[1.2px] border-gray-300 rounded-sm p-2 text-sm">
                                 <option value="">Select an option</option>
                                 <option value="food">Food</option>
                                 <option value="transport">Transport</option>
@@ -28,14 +61,13 @@ const Home = () =>{
                             </select>
                         </label>
 
-
                         <label htmlFor="date" className="flex flex-col">Date
-                            <input id="date" type="date" className="border-[1.2px] border-gray-300 rounded-sm p-2 text-sm"/>
+                            <input name="date" value={form.date} onChange={handleChange} id="date" type="date" className="border-[1.2px] border-gray-300 rounded-sm p-2 text-sm"/>
                         </label>
 
 
                         <div className="flex flex-row justify-between mt-4 gap-4">
-                            <button className="text-lg bg-[#31a173] text-[#FFFFFF] rounded-sm py-2 px-4 w-full">Add Expense</button>
+                            <button onClick={handleAdd} className="text-lg bg-[#31a173] text-[#FFFFFF] rounded-sm py-2 px-4 w-full">Add Expense</button>
                             <button className="text-lg bg-[#3f87e7] text-[#FFFFFF] rounded-sm py-2 px-4 w-full">Update Expense</button>
                         </div>
                     </form>
@@ -56,35 +88,37 @@ const Home = () =>{
                         </thead>
 
                         <tbody>
-                            <tr className="border border-black p-2 hover:bg-[#f7f8f9]">
-                                <td className="text-start p-3">Food</td>
-                                <td className="text-start p-3">100</td>
-                                <td className="text-start p-3">Food</td>
-                                <td className="text-start p-3">2021-09-01</td>
-                                <td className="p-3">
-                                    <button className="text-sm bg-red-600 text-[#FFFFFF] rounded-sm py-1 px-2 hover:cursor-pointer">Delete</button>
-                                </td>
-                            </tr>
+                            {expense.map(exp => (
+                                <tr key={exp._id} className="border border-black p-2 hover:bg-[#f7f8f9]">
+                                    <td className="text-start p-3">{exp.name}</td>
+                                    <td className="text-start p-3">{exp.amount}</td>
+                                    <td className="text-start p-3">{exp.category}</td>
+                                    <td className="text-start p-3">{exp.date}</td>
+                                    <td className="p-3">
+                                        <button className="text-sm bg-red-600 text-[#FFFFFF] rounded-sm py-1 px-2 hover:cursor-pointer">Delete</button>
+                                    </td>
+                                </tr>
+                            ))}
 
-                            <tr className="border border-black p-2 hover:bg-[#f7f8f9]">
-                                <td className="text-start p-3">Transport</td>
-                                <td className="text-start p-3">200</td>
-                                <td className="text-start p-3">Transport</td>
-                                <td className="text-start p-3">2021-09-02</td>
-                                <td className="p-3">
-                                    <button className="text-sm bg-red-600 text-[#FFFFFF] rounded-sm py-1 px-2 hover:cursor-pointer">Delete</button>
-                                </td>
-                            </tr>
+                            {/*<tr className="border border-black p-2 hover:bg-[#f7f8f9]">*/}
+                            {/*    <td className="text-start p-3">Transport</td>*/}
+                            {/*    <td className="text-start p-3">200</td>*/}
+                            {/*    <td className="text-start p-3">Transport</td>*/}
+                            {/*    <td className="text-start p-3">2021-09-02</td>*/}
+                            {/*    <td className="p-3">*/}
+                            {/*        <button className="text-sm bg-red-600 text-[#FFFFFF] rounded-sm py-1 px-2 hover:cursor-pointer">Delete</button>*/}
+                            {/*    </td>*/}
+                            {/*</tr>*/}
 
-                            <tr className="border border-black p-2 hover:bg-[#f7f8f9]">
-                                <td className="text-start p-3">Entertainment</td>
-                                <td className="text-start p-3">200</td>
-                                <td className="text-start p-3">Transport</td>
-                                <td className="text-start p-3">2021-09-02</td>
-                                <td className="p-3">
-                                    <button className="text-sm bg-red-600 text-[#FFFFFF] rounded-sm py-1 px-2 hover:cursor-pointer">Delete</button>
-                                </td>
-                            </tr>
+                            {/*<tr className="border border-black p-2 hover:bg-[#f7f8f9]">*/}
+                            {/*    <td className="text-start p-3">Entertainment</td>*/}
+                            {/*    <td className="text-start p-3">200</td>*/}
+                            {/*    <td className="text-start p-3">Transport</td>*/}
+                            {/*    <td className="text-start p-3">2021-09-02</td>*/}
+                            {/*    <td className="p-3">*/}
+                            {/*        <button className="text-sm bg-red-600 text-[#FFFFFF] rounded-sm py-1 px-2 hover:cursor-pointer">Delete</button>*/}
+                            {/*    </td>*/}
+                            {/*</tr>*/}
                         </tbody>
                     </table>
 
@@ -97,4 +131,4 @@ const Home = () =>{
     )
 }
 
-export default Home
+export default Home;
