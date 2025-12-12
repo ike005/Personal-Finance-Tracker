@@ -8,6 +8,7 @@ dotenv.config();
 const PORT = process.env.PORT || 8080;
 const MONGOURL = process.env.MONGO_URL;
 
+app.use(express.json());
 app.use(cors());
 
 mongoose.connect(MONGOURL).then(() => {
@@ -34,7 +35,7 @@ app.get('/expense', async(req, res) => {
     } catch(error){
         res.json(error);
     }
-})
+});
 
 app.post('/expense', async(req, res) => {
     try{
@@ -43,17 +44,34 @@ app.post('/expense', async(req, res) => {
     } catch(error){
         res.json(error);
     }
-})
+});
 
-// app.get('/expense', async(req, res) => {
-//     try {
-//         const expenseData = await model.find();
-//         console.log("DATA RETURNED FROM MONGO:", JSON.stringify(expenseData, null, 2));
-//         res.json(expenseData);
-//     } catch(error){
-//         console.log(error);
-//         res.json(error);
-//     }
-// });
+app.delete('/expense/:id', async (req, res) => {
+    try {
+        const deletedExpense = await model.findByIdAndDelete(req.params.id);
+        if (!deletedExpense) {
+            return res.status(404).json({ message: 'Expense not found' });
+        }
+        res.json({ message: 'Expense deleted successfully', deletedExpense });
+    } catch (error) {
+        res.status(500).json(error);
+    }
+});
+
+app.put('/expense/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updatedData = req.body;
+
+        const updatedExpense = await model.findByIdAndUpdate(id, updatedData, { new: true }); // returns the updated document);
+        if (!updatedExpense) {
+            return res.status(404).json({ message: 'Expense not found' });
+        }
+        res.json(updatedExpense);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
 
 
