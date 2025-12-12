@@ -21,7 +21,7 @@ const Home = () =>{
         setForm({ ...form, [e.target.name]: e.target.value });
     };
 
-    const handleUpdateChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const handleUpdateChange = (e) => {
         setUpdateForm({ ...updateForm, [e.target.name]: e.target.value });
     };
 
@@ -45,7 +45,7 @@ const Home = () =>{
             await fetch(`http://localhost:8000/expense/${id}`, {
                 method: 'DELETE',
             });
-            handleFetch(); // Refresh the list after deletion
+            handleFetch();
         } catch (error) {
             console.error('Error deleting expense:', error);
         }
@@ -104,8 +104,7 @@ const Home = () =>{
 
 
                         <div className="flex flex-row justify-between mt-4 gap-4">
-                            <button type="submit" className="text-lg bg-[#31a173] text-[#FFFFFF] rounded-sm py-2 px-4 w-full">Add Expense</button>
-                            {/*<button className="text-lg bg-[#3f87e7] text-[#FFFFFF] rounded-sm py-2 px-4 w-full">Update Expense</button>*/}
+                            <button type="submit" className="text-lg bg-[#31a173] text-[#FFFFFF] rounded-sm py-2 px-4 w-full cursor-pointer">Add Expense</button>
                         </div>
                     </form>
                 </div>
@@ -175,10 +174,7 @@ const Home = () =>{
                             <input name="date" value={updateForm.date} onChange={handleUpdateChange} id="date" type="date" required className="border-[1.2px] border-gray-300 rounded-sm p-2 text-sm"/>
                         </label>
 
-                        <button
-                            type="submit"
-                            className="text-lg bg-[#3f87e7] text-white rounded-sm py-2 px-4 w-full"
-                        >
+                        <button type="submit" className="text-lg bg-[#3f87e7] text-white rounded-sm py-2 px-4 w-full cursor-pointer">
                             Update Expense
                         </button>
                     </form>
